@@ -1,0 +1,41 @@
+diff --git a/clang/lib/CodeGen/ItaniumCXXABI.cpp b/clang/lib/CodeGen/ItaniumCXXABI.cpp
+index 5671f44dd869..05750965bcfd 100644
+--- a/clang/lib/CodeGen/ItaniumCXXABI.cpp
++++ b/clang/lib/CodeGen/ItaniumCXXABI.cpp
+@@ -1661,9 +1661,14 @@ void ItaniumCXXABI::addImplicitStructorParams(CodeGenFunction &CGF,
+ }
+ 
+ void ItaniumCXXABI::EmitInstanceFunctionProlog(CodeGenFunction &CGF) {
++  // PATCH: Naked lambdas, crash this code.
++  //
+   // Naked functions have no prolog.
+   if (!CGF.CurFuncDecl || CGF.CurFuncDecl->hasAttr<NakedAttr>())
+     return;
++  /*// Naked functions have no prolog.
++  if (CGF.CurFuncDecl && CGF.CurFuncDecl->hasAttr<NakedAttr>())
++    return;*/
+ 
+   /// Initialize the 'this' slot. In the Itanium C++ ABI, no prologue
+   /// adjustments are required, because they are all handled by thunks.
+diff --git a/clang/lib/CodeGen/MicrosoftCXXABI.cpp b/clang/lib/CodeGen/MicrosoftCXXABI.cpp
+index 9fedb4fbfcd9..37869b3cd976 100644
+--- a/clang/lib/CodeGen/MicrosoftCXXABI.cpp
++++ b/clang/lib/CodeGen/MicrosoftCXXABI.cpp
+@@ -1506,9 +1506,14 @@ void MicrosoftCXXABI::addImplicitStructorParams(CodeGenFunction &CGF,
+ }
+ 
+ void MicrosoftCXXABI::EmitInstanceFunctionProlog(CodeGenFunction &CGF) {
++  // PATCH: Naked lambdas, crash this code.
++  //
+   // Naked functions have no prolog.
+   if (!CGF.CurFuncDecl || CGF.CurFuncDecl->hasAttr<NakedAttr>())
+     return;
++  /*// Naked functions have no prolog.
++  if (CGF.CurFuncDecl && CGF.CurFuncDecl->hasAttr<NakedAttr>())
++    return;*/
+ 
+   // Overridden virtual methods of non-primary bases need to adjust the incoming
+   // 'this' pointer in the prologue. In this hierarchy, C::b will subtract
+-- 
+2.26.2.windows.1
+

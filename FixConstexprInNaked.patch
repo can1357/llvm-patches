@@ -1,0 +1,34 @@
+diff --git a/clang/lib/Sema/SemaDecl.cpp b/clang/lib/Sema/SemaDecl.cpp
+index ce7475b0d5da..0a25a033cd58 100644
+--- a/clang/lib/Sema/SemaDecl.cpp
++++ b/clang/lib/Sema/SemaDecl.cpp
+@@ -14556,11 +14556,13 @@ Decl *Sema::ActOnFinishFunctionBody(Decl *dcl, Stmt *Body,
+         !CheckConstexprFunctionDefinition(FD, CheckConstexprKind::Diagnose))
+       FD->setInvalidDecl();
+ 
+-    if (FD && FD->hasAttr<NakedAttr>()) {
++    // PATCH: Too restrictive and does not allow constexpr statements,
++    // if you do not do anything obviously dumb, will end up just fine.
++    //
++    /*if (FD && FD->hasAttr<NakedAttr>()) {
+       for (const Stmt *S : Body->children()) {
+-        // Allow local register variables without initializer as they don't
+-        // require prologue.
+-        bool RegisterVariables = false;
++         //Allow local register variables without initializer as they don't
++         // require prologue.
+         if (auto *DS = dyn_cast<DeclStmt>(S)) {
+           for (const auto *Decl : DS->decls()) {
+             if (const auto *Var = dyn_cast<VarDecl>(Decl)) {
+@@ -14580,7 +14582,7 @@ Decl *Sema::ActOnFinishFunctionBody(Decl *dcl, Stmt *Body,
+           break;
+         }
+       }
+-    }
++    }*/
+ 
+     assert(ExprCleanupObjects.size() ==
+                ExprEvalContexts.back().NumCleanupObjects &&
+-- 
+2.26.2.windows.1
+

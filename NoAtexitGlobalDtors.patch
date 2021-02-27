@@ -1,0 +1,36 @@
+diff --git a/clang/lib/CodeGen/CodeGenModule.h b/clang/lib/CodeGen/CodeGenModule.h
+index c59570598b0d..c8d742582a60 100644
+--- a/clang/lib/CodeGen/CodeGenModule.h
++++ b/clang/lib/CodeGen/CodeGenModule.h
+@@ -1481,9 +1481,10 @@ private:
+   // FIXME: Hardcoding priority here is gross.
+   void AddGlobalCtor(llvm::Function *Ctor, int Priority = 65535,
+                      llvm::Constant *AssociatedData = nullptr);
++public:
+   void AddGlobalDtor(llvm::Function *Dtor, int Priority = 65535,
+                      bool IsDtorAttrFunc = false);
+-
++private:
+   /// EmitCtorList - Generates a global array of functions and priorities using
+   /// the given list and name. This array will have appending linkage and is
+   /// suitable for use as a LLVM constructor or destructor array. Clears Fns.
+diff --git a/clang/lib/CodeGen/MicrosoftCXXABI.cpp b/clang/lib/CodeGen/MicrosoftCXXABI.cpp
+index c16c72dc93d5..d30e8b0e9452 100644
+--- a/clang/lib/CodeGen/MicrosoftCXXABI.cpp
++++ b/clang/lib/CodeGen/MicrosoftCXXABI.cpp
+@@ -2330,8 +2330,10 @@ void MicrosoftCXXABI::registerGlobalDtor(CodeGenFunction &CGF, const VarDecl &D,
+   if (D.getTLSKind())
+     return emitGlobalDtorWithTLRegDtor(CGF, D, Dtor, Addr);
+ 
+-  // The default behavior is to use atexit.
+-  CGF.registerGlobalDtorWithAtExit(D, Dtor, Addr);
++// PATCH: There is literally no reason to do this.
++//
++  CGM.AddGlobalDtor(CGF.createAtExitStub(D, Dtor, Addr));
++  // CGF.registerGlobalDtorWithAtExit(D, Dtor, Addr);
+ }
+ 
+ void MicrosoftCXXABI::EmitThreadLocalInitFuncs(
+-- 
+2.26.2.windows.1
+
